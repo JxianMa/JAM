@@ -39,6 +39,8 @@
 		253EBC061A8998A700826C6E /* social-instagram-outline.png in Resources */ = {isa = PBXBuildFile; fileRef = 253EBBFA1A8998A700826C6E /* social-instagram-outline.png */; };
 		253EBC071A8998A700826C6E /* social-twitter-outline.png in Resources */ = {isa = PBXBuildFile; fileRef = 253EBBFB1A8998A700826C6E /* social-twitter-outline.png */; };
 		253EBC091A89993900826C6E /* JixianMa.JPG in Resources */ = {isa = PBXBuildFile; fileRef = 253EBC081A89993900826C6E /* JixianMa.JPG */; };
+		253EBC0D1A89B25100826C6E /* CommunicationHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 253EBC0C1A89B25100826C6E /* CommunicationHandler.m */; };
+		253EBC101A89BF2200826C6E /* BrowseDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 253EBC0F1A89BF2200826C6E /* BrowseDeviceViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +104,10 @@
 		253EBBFA1A8998A700826C6E /* social-instagram-outline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "social-instagram-outline.png"; sourceTree = "<group>"; };
 		253EBBFB1A8998A700826C6E /* social-twitter-outline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "social-twitter-outline.png"; sourceTree = "<group>"; };
 		253EBC081A89993900826C6E /* JixianMa.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = JixianMa.JPG; sourceTree = "<group>"; };
+		253EBC0B1A89B25100826C6E /* CommunicationHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommunicationHandler.h; sourceTree = "<group>"; };
+		253EBC0C1A89B25100826C6E /* CommunicationHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommunicationHandler.m; sourceTree = "<group>"; };
+		253EBC0E1A89BF2200826C6E /* BrowseDeviceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowseDeviceViewController.h; sourceTree = "<group>"; };
+		253EBC0F1A89BF2200826C6E /* BrowseDeviceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowseDeviceViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,13 +149,11 @@
 		253EBB9E1A89971300826C6E /* JAM */ = {
 			isa = PBXGroup;
 			children = (
-				253EBBEB1A8997D100826C6E /* Model */,
-				253EBBC91A89975F00826C6E /* PeopleView */,
+				253EBC111A89BF4D00826C6E /* HomePage */,
 				253EBBC81A89975800826C6E /* FoodView */,
-				253EBBA31A89971300826C6E /* AppDelegate.h */,
-				253EBBA41A89971300826C6E /* AppDelegate.m */,
-				253EBBA91A89971300826C6E /* ViewController.h */,
-				253EBBAA1A89971300826C6E /* ViewController.m */,
+				253EBBC91A89975F00826C6E /* PeopleView */,
+				253EBC0A1A89B20000826C6E /* MultipeerConnect */,
+				253EBBEB1A8997D100826C6E /* Model */,
 				253EBBAC1A89971300826C6E /* Main.storyboard */,
 				253EBBAF1A89971300826C6E /* Images.xcassets */,
 				253EBBB11A89971300826C6E /* LaunchScreen.xib */,
@@ -164,6 +168,8 @@
 		253EBB9F1A89971300826C6E /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				253EBBA31A89971300826C6E /* AppDelegate.h */,
+				253EBBA41A89971300826C6E /* AppDelegate.m */,
 				253EBBEF1A89985B00826C6E /* Demo Photos */,
 				253EBBA01A89971300826C6E /* Info.plist */,
 				253EBBA11A89971300826C6E /* main.m */,
@@ -265,6 +271,26 @@
 				253EBBFB1A8998A700826C6E /* social-twitter-outline.png */,
 			);
 			name = "Demo Photos";
+			sourceTree = "<group>";
+		};
+		253EBC0A1A89B20000826C6E /* MultipeerConnect */ = {
+			isa = PBXGroup;
+			children = (
+				253EBC0B1A89B25100826C6E /* CommunicationHandler.h */,
+				253EBC0C1A89B25100826C6E /* CommunicationHandler.m */,
+				253EBC0E1A89BF2200826C6E /* BrowseDeviceViewController.h */,
+				253EBC0F1A89BF2200826C6E /* BrowseDeviceViewController.m */,
+			);
+			name = MultipeerConnect;
+			sourceTree = "<group>";
+		};
+		253EBC111A89BF4D00826C6E /* HomePage */ = {
+			isa = PBXGroup;
+			children = (
+				253EBBA91A89971300826C6E /* ViewController.h */,
+				253EBBAA1A89971300826C6E /* ViewController.m */,
+			);
+			name = HomePage;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -380,11 +406,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				253EBC101A89BF2200826C6E /* BrowseDeviceViewController.m in Sources */,
 				253EBBA51A89971300826C6E /* AppDelegate.m in Sources */,
 				253EBBA21A89971300826C6E /* main.m in Sources */,
 				253EBBD91A89978400826C6E /* NameTagCollectionViewCell.m in Sources */,
 				253EBBDA1A89978400826C6E /* PeopleViewController.m in Sources */,
 				253EBBD01A89977400826C6E /* FoodInfo.m in Sources */,
+				253EBC0D1A89B25100826C6E /* CommunicationHandler.m in Sources */,
 				253EBBE91A8997AD00826C6E /* RPSlidingMenuLayout.m in Sources */,
 				253EBBDF1A8997A600826C6E /* EBCardCollectionViewLayout.m in Sources */,
 				253EBBD11A89977400826C6E /* FoodNametagCollectionCell.m in Sources */,
@@ -585,6 +613,7 @@
 				253EBBC41A89971300826C6E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		253EBBC51A89971300826C6E /* Build configuration list for PBXNativeTarget "JAMTests" */ = {
 			isa = XCConfigurationList;
@@ -593,6 +622,7 @@
 				253EBBC71A89971300826C6E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

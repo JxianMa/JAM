@@ -32,7 +32,7 @@
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xCY-hh-mha" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="222" y="-855"/>
+            <point key="canvasLocation" x="284" y="-897"/>
         </scene>
         <!--viewController-->
         <scene sceneID="JRi-uH-Tvd">
@@ -181,6 +181,11 @@
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="YLO-HW-rZK"/>
+                                    <barButtonItem title="Search" id="7jW-Yq-yKs">
+                                        <connections>
+                                            <action selector="searchNearbyDevices:" destination="zKT-JD-Lah" id="DDq-L3-4CN"/>
+                                        </connections>
+                                    </barButtonItem>
                                 </items>
                             </toolbar>
                         </subviews>
@@ -200,8 +205,8 @@
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
-                                <exclude reference="lix-WY-oIh"/>
                                 <exclude reference="grD-cV-Bra"/>
+                                <exclude reference="lix-WY-oIh"/>
                             </mask>
                         </variation>
                         <variation key="heightClass=compact-widthClass=compact">
@@ -217,7 +222,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OSm-fu-JAv" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="703" y="-1167"/>
+            <point key="canvasLocation" x="681" y="-1194"/>
         </scene>
         <!--foodViewController-->
         <scene sceneID="2A4-yS-hTg">
@@ -402,7 +407,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9hd-FZ-dj5" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="703" y="-539"/>
+            <point key="canvasLocation" x="681" y="-573"/>
         </scene>
     </scenes>
     <resources>

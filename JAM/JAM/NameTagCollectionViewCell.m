@@ -1,6 +1,6 @@
 //
 //  NameTagCollectionViewCell.m
-//  Jam00
+//  Jam
 //
 //  Created by MaJixian on 1/27/15.
 //  Copyright (c) 2015 MaJixian. All rights reserved.
