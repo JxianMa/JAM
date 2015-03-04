@@ -15,5 +15,8 @@
 
 @property(strong)NSString *name;
 @property(strong)NSString *photoName;
+@property(strong)NSString *selfDescription;
+@property(strong)NSString *phoneNumber;
+@property(strong)NSString *emailAdd;
 
 @end

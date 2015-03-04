@@ -7,6 +7,10 @@
 //
 #import "ViewController.h"
 #import "PeopleViewController.h"
+#import <AWSiOSSDKv2/S3.h>
+#import <AWSiOSSDKv2/DynamoDB.h>
+#import <AWSiOSSDKv2/SQS.h>
+#import <AWSiOSSDKv2/SNS.h>
 
 @interface ViewController ()
 

@@ -12,7 +12,7 @@
 #import "FoodInfo.h"
 #import "ViewController.h"
 
-@interface FoodViewController ()
+@interface FoodViewController ()<UIGestureRecognizerDelegate>
 
 @end
 
@@ -30,7 +30,7 @@
     }
     [self setOffsetOfCollectionView];
     UIPanGestureRecognizer * panner=[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(handlePan:)];
-    panner.delegate = foodCollectionView;
+    panner.delegate = self;
     [self.view addGestureRecognizer:panner];
 }
 
@@ -71,7 +71,7 @@
     
     CGPoint swipeLocation = [gestureRecognizer locationInView:foodCollectionView];
     NSIndexPath *swipedIndexPath = [foodCollectionView indexPathForItemAtPoint:swipeLocation];
-    FoodNametagCollectionCell *swipedCell = [foodCollectionView cellForItemAtIndexPath:swipedIndexPath];
+    FoodNametagCollectionCell *swipedCell = (FoodNametagCollectionCell *)[foodCollectionView cellForItemAtIndexPath:swipedIndexPath];
     UICollectionViewLayoutAttributes *attributes = [foodCollectionView layoutAttributesForItemAtIndexPath:swipedIndexPath];
     UICollectionViewCell *cellRecorder = swipedCell;
     CGPoint orignialPosition = attributes.center;
@@ -107,7 +107,6 @@
         restorePosition.y = orignialPosition.y;
         cellRecorder.center = restorePosition;
         [gestureRecognizer setTranslation:CGPointZero inView:self.view];
-        
     }
     
 }

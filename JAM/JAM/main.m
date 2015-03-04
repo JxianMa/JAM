@@ -1,5 +1,4 @@
-//
-//  main.m
+//  main
 //  JAM
 //
 //  Created by MaJixian on 2/9/15.

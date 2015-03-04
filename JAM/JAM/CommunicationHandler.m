@@ -7,6 +7,8 @@
 //
 
 #import "CommunicationHandler.h"
+#import "AppDelegate.h"
+#import "People.h"
 
 @implementation CommunicationHandler
 

@@ -8,16 +8,17 @@
 
 #import <UIKit/UIKit.h>
 #import "PersonInfo.h"
+#import "People.h"
 
-@interface NameTagCollectionViewCell : UICollectionViewCell
+@interface NameTagCollectionViewCell : UICollectionViewCell<UITextFieldDelegate>
 
-{
+@property (weak, nonatomic) IBOutlet UIImageView *personImageView;
+@property (weak, nonatomic) IBOutlet UITextField *personNameTextField;
+@property (weak, nonatomic) IBOutlet UITextField *personSelfDescTextField;
+@property (weak, nonatomic) IBOutlet UITextField *personPhoneNumTextField;
+@property (weak, nonatomic) IBOutlet UITextField *personEmailAddTextField;
 
-    __weak IBOutlet UIImageView *personImageView;
-   
-    __weak IBOutlet UILabel *personNameLabel;
-    
-
-}
-@property (weak, nonatomic) PersonInfo *personInfo;
+@property (strong, nonatomic) NSArray *textFieldsStatusArray;
+@property (strong, nonatomic) PersonInfo *personInfo;
+@property (strong, nonatomic) People *peopleInfo;
 @end

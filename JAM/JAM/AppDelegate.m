@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import <AWSiOSSDKv2/AWSCore.h>
 
 @interface AppDelegate ()
 
@@ -17,7 +18,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.CommunicationHandler = [[CommunicationHandler alloc]init];
-    // Override point for customization after application launch.
+   // Override point for customization after application launch.
     return YES;
 }
 
@@ -45,11 +46,13 @@
     [self saveContext];
 }
 
+
 #pragma mark - Core Data stack
 
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
+
 
 - (NSURL *)applicationDocumentsDirectory {
     // The directory the application uses to store the Core Data store file. This code uses a directory named "JXM.JAM" in the application's documents directory.
@@ -75,7 +78,7 @@
     // Create the coordinator and store
     
     _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"JAM.sqlite"];
+    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"JAMLocal.sqlite"];
     NSError *error = nil;
     NSString *failureReason = @"There was an error creating or loading the application's saved data.";
     if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error]) {

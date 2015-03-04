@@ -16,6 +16,9 @@
     if (self) {
         self.name = infoDictionary[@"name"];
         self.photoName = infoDictionary[@"photoName"];
+        self.selfDescription = infoDictionary[@"selfDescription"];
+        self.phoneNumber = infoDictionary[@"phoneNumber"];
+        self.emailAdd = infoDictionary[@"emailAdd"];
     }
     return self;
 }
