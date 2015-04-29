@@ -7,15 +7,14 @@
 //
 
 #import "NameTagCollectionViewCell.h"
-#import "People.h"
 #import "AppDelegate.h"
 
 @interface NameTagCollectionViewCell()
-@property (weak, nonatomic) IBOutlet UIButton *addPhotoBtn;
 
 @end
 
 @implementation NameTagCollectionViewCell
+
 
 /*
 - (void)setPersonInfo:(PersonInfo *)personInfo
@@ -30,15 +29,59 @@
 }
 */
 
+- (void)setStoryInfo:(StoryModel *)storyInfo
+{
+    _storyInfo = storyInfo;
+    self.storyNameTextField.text = _storyInfo.storyName;
+    self.storyDescTextField.text = _storyInfo.storyDescription;
+    self.storyTextView.text = _storyInfo.story;
+    self.storyId = _storyInfo.storyId;
+    UIImage *storyImage = [UIImage imageWithData:_storyInfo.photo];
+    self.storyImageView.image = storyImage;
+    double uploadTime = [_storyInfo.uploadTime doubleValue];
+    double currentTime = [[NSDate date] timeIntervalSince1970];
+    NSInteger ti = currentTime - uploadTime;
+    NSInteger hours = (ti / 3600);
+    if (hours > 0) {
+        self.timeLabel.text = [NSString stringWithFormat:@"%ld hours ago", (long)hours];
+    }else {
+        NSInteger mins = (ti/60);
+        if (mins > 0) {
+            self.timeLabel.text = [NSString stringWithFormat:@"%ld mins ago", (long)mins];
+        }else {
+            NSInteger secs = ti;
+            if (secs > 0) {
+                self.timeLabel.text = [NSString stringWithFormat:@"%ld secs ago", (long)secs];
+            }else {
+                self.timeLabel.text = [NSString stringWithFormat:@"0 secs ago"];
+            }
+        }
+    }
+    self.countingLabel.text = @"0";
+    self.layer.cornerRadius = 5;
+    self.layer.masksToBounds = YES;
+}
+- (IBAction)addJam:(UIButton *)sender
+{
+    NSUInteger jamCounting = [self.countingLabel.text integerValue];
+    //self.countingLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)jamCounting++];
+    jamCounting = jamCounting+1;
+    [self.countingLabel setText:[NSString stringWithFormat:@"%lu",(unsigned long)jamCounting]];
+}
 
-- (void)setPeopleInfo:(People *)peopleInfo
+/*
+- (void)setPeopleInfo:(PeopleModel *)peopleInfo
 {
     _peopleInfo = peopleInfo;
+    self.storyNameTextField.text = _peopleInfo.storyName;
+    self.storyDescTextField.text = _peopleInfo.storyDescription;
+    self.storyTextView.text = _peopleInfo.story;
+    UIImage *storyImage = [UIImage imageWithData:_peopleInfo.photo];
+    self.storyImageView.image = storyImage;
+    // NSString *nameTextFieldPhrString = @"Enter your name...";
+    //UIColor *nameTextFieldPhrColor = [UIColor whiteColor];
+    //self.personNameTextField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:nameTextFieldPhrString attributes:@{NSForegroundColorAttributeName:nameTextFieldPhrColor}];
     
-    NSString *nameTextFieldPhrString = @"Enter your name...";
-    UIColor *nameTextFieldPhrColor = [UIColor whiteColor];
-    self.personNameTextField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:nameTextFieldPhrString attributes:@{NSForegroundColorAttributeName:nameTextFieldPhrColor}];
-    /*
     self.textFieldsStatusArray = @[self.personNameTextField,self.personSelfDescTextField,self.personPhoneNumTextField,self.personEmailAddTextField];
     for (UITextField *eachTextField in self.textFieldsStatusArray)
     {
@@ -52,15 +95,10 @@
     {
         self.addPhotoBtn.hidden = YES;
     }
-     */
+    
     //Default contents
     //personImageView.image = [UIImage imageNamed:_personInfo.photoName];
-    self.personNameTextField.text = _peopleInfo.name;
-    self.personSelfDescTextField.text = _peopleInfo.selfDescription;
-    self.personPhoneNumTextField.text = _peopleInfo.phoneNumber;
-    self.personEmailAddTextField.text = _peopleInfo.emailAdd;
-    UIImage *peopleImage = [UIImage imageWithData:_peopleInfo.photo];
-    self.personImageView.image = peopleImage;
+
 }
 
 /*

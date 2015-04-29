@@ -9,30 +9,30 @@
 #import "PeopleViewController.h"
 #import "NameTagCollectionViewCell.h"
 #import "EBCardCollectionViewLayout.h"
-#import "ObjectInfo.h"
 #import "ViewController.h"
 #import "AppDelegate.h"
-#import "People.h"
+#import "DynamoDB.h"
+#import "UIImageView+AFNetworking.h"
+#import "commentPageViewController.h"
+#import "AddViewController.h"
 
 
-/***************************when two cards left, cannot delete the second card***********************************/
-/***************************fetching progress put to another thread***********************************/
-/***************************Instead of sharing person's self information, 
-                            what about sharing photos and little description(events)
-                            around you?***********************************/
 
-
-@interface PeopleViewController () <UIGestureRecognizerDelegate>
+@interface PeopleViewController () <UIGestureRecognizerDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic,strong) AppDelegate *appDelegate;
+@property (nonatomic,strong) CLLocationManager *locationManager;
 @property (nonatomic,strong) UIImageView *movingCell;
 //Since the receive method and send method requires this AlertView, Declare it here.
 @property (nonatomic,strong) UIAlertView *waitingForResponseAlertView;
 @property (nonatomic,strong) UIAlertView *receiveDataAlertView;
 @property (nonatomic,strong) UIAlertView *removeCellAlertView;
-@property (nonatomic,strong) NSMutableArray *peopleInformation;
+@property (nonatomic,strong) NSArray *storyInformation;
+@property (nonatomic,strong) UIActivityIndicatorView *spinner;
 @property (nonatomic,strong) id receivedObject;
-@property NameTagCollectionViewCell *removeChosenCell;
+@property (nonatomic,strong) NSString *currentPostalCode;
+@property (nonatomic,strong) NSNumber *storyId;
+@property (strong,nonatomic)commentPageViewController *segueDestVC;
 @end
 
 @implementation PeopleViewController
@@ -40,25 +40,121 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
- 
     [self setOffsetOfCollectionView];
-    UIPanGestureRecognizer * panner=[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(handlePan:)];
-    panner.delegate = self;
-    [self.view addGestureRecognizer:panner];
-    [self setupConnection];
-    [[NSNotificationCenter defaultCenter] addObserver:self
+    [self.navigationController.navigationBar setBarTintColor:[UIColor grayColor]];
+    [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+    [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+    [[UIApplication sharedApplication]setNetworkActivityIndicatorVisible:YES];
+    [self.peopleCollectionView alwaysBounceHorizontal];
+    // UIPanGestureRecognizer * panner=[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(handlePan:)];
+    //panner.delegate = self;
+    //[self.view addGestureRecognizer:panner];
+    //[self setupConnection];
+    /*    [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(handleReceivedDataWithNotification:)
                                                  name:@"JAM_DidReceiveDataNotification"
-                                               object:nil];
+                                               object:nil];*/
 }
+
+
+- (IBAction)refreshBtn:(UIButton *)sender
+{
+    [[UIApplication sharedApplication]setNetworkActivityIndicatorVisible:YES];
+    [self getLocation];
+}
+
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    self.peopleInformation = [self fetchRequestResult];
-    NSLog(@"fetched people%@",self.peopleInformation);
+    [self getLocation];
+    [[UIApplication sharedApplication]setNetworkActivityIndicatorVisible:YES];
 }
-#pragma mark setup database fetching
 
+- (void)getLocation
+{
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
+    self.locationManager.distanceFilter = 100;
+    if ([self.locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+        [self.locationManager requestWhenInUseAuthorization];
+    }
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+     didUpdateLocations:(NSArray *)locations {
+    self.currentlocation = [locations lastObject];
+    NSLog(@"latitude:%+.6f, longtitude:%+.6f\n",self.currentlocation.coordinate.latitude,self.currentlocation.coordinate.longitude);
+    [self setBackgroundImgWithLocation];
+    [self getGeocodeLocation];
+}
+
+- (void)getGeocodeLocation
+{
+    NSLog(@"currentLocation:%@",self.currentlocation);
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    [geocoder reverseGeocodeLocation:self.currentlocation completionHandler:
+     ^(NSArray* placemarks, NSError* error){
+         if ([placemarks count] > 0)
+         {
+             CLPlacemark *placeMark = [placemarks objectAtIndex:0];
+             [self performDynamoDBScanWithPostalCode:placeMark.postalCode];
+         }
+     }];
+}
+
+- (void)performDynamoDBScanWithPostalCode:(NSString *)postalCode
+{
+    AWSDynamoDBObjectMapper *dynamoDBObjectMapper = [AWSDynamoDBObjectMapper defaultDynamoDBObjectMapper];
+    /*AWSDynamoDBScanExpression *scanExpression = [AWSDynamoDBScanExpression new];
+    scanExpression.limit = @10;
+    AWSDynamoDBCondition *condition = [AWSDynamoDBCondition new];
+    AWSDynamoDBAttributeValue *attribute = [AWSDynamoDBAttributeValue new];
+    attribute.S = postalCode;
+    condition.attributeValueList = @[attribute];
+    condition.comparisonOperator = AWSDynamoDBComparisonOperatorEQ;
+    scanExpression.scanFilter = @{@"postalCode":condition};*/
+    AWSDynamoDBQueryExpression *dynamodbQueryExpression = [AWSDynamoDBQueryExpression new];
+    dynamodbQueryExpression.hashKeyValues = postalCode;
+    dynamodbQueryExpression.scanIndexForward = @NO;
+    dynamodbQueryExpression.limit = @10;
+    [[dynamoDBObjectMapper query:[StoryModel class] expression:dynamodbQueryExpression]
+      continueWithExecutor:[BFExecutor mainThreadExecutor] withBlock:^id(BFTask *task) {
+         if (task.error) {
+             NSLog(@"The request failed. Error:[%@]",task.error);
+         }
+         if (task.result) {
+             NSLog(@"taskResult:%@",task.result);
+             AWSDynamoDBPaginatedOutput *paginatedOutput = task.result;
+             self.storyInformation = paginatedOutput.items;
+             [[UIApplication sharedApplication]setNetworkActivityIndicatorVisible:NO];
+             [self.peopleCollectionView performBatchUpdates:^{
+                 [self.peopleCollectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
+             } completion:nil];
+             //[self.peopleCollectionView reloadData];
+             [[UIApplication sharedApplication]setNetworkActivityIndicatorVisible:NO];
+         }
+         return nil;
+     }];
+    //NSLog(@"peopleInformation:%@", self.storyInformation);
+}
+
+
+- (void)setBackgroundImgWithLocation
+{
+    NSURL *googleStreetViewURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=90&heading=235&pitch=10",(int)self.view.frame.size.width,(int)self.view.frame.size.height, self.currentlocation.coordinate.latitude,self.currentlocation.coordinate.longitude]];
+    NSLog(@"GooglestreetView:latitude:%+.6f, longtitude:%+.6f\n",self.currentlocation.coordinate.latitude,self.currentlocation.coordinate.longitude);    self.backgroundImgView = [[UIImageView alloc] initWithFrame:CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height)];
+
+    [self.backgroundImgView setImageWithURL: googleStreetViewURL placeholderImage:nil];
+    [self.view addSubview:self.backgroundImgView];
+    [self.view sendSubviewToBack:self.backgroundImgView];
+    
+}
+
+
+#pragma mark setup database fetching
+/*
 - (NSMutableArray *)fetchRequestResult
 {
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"People"];
@@ -71,43 +167,43 @@
     resultArray = (NSMutableArray *)[self.appDelegate.managedObjectContext executeFetchRequest:request error:&error];
     return resultArray;
 }
-
+*/
 
 
 
 
 #pragma mark add & modify new businesscard and remove
 
-
-- (IBAction)removeBusinessCard:(UIButton *)sender
+/*
+- (NameTagCollectionViewCell *)currentExploringCell
 {
     NSArray *visibleCellArray = [self.peopleCollectionView visibleCells];
     for (NameTagCollectionViewCell *mainCell in visibleCellArray) {
         // The first card
         if (self.peopleCollectionView.contentOffset.x == 0 && [visibleCellArray count] == 2) {
             if (mainCell.frame.origin.x < (self.peopleCollectionView.contentOffset.x + mainCell.frame.size.width)) {
-                [self removeCardAtCurrentCell:mainCell];
+                return mainCell;
                 break;
             }
         }
         // The last card
         if (self.peopleCollectionView.contentOffset.x > mainCell.frame.size.width && [visibleCellArray count] == 2) {
             if (mainCell.frame.origin.x > self.peopleCollectionView.contentOffset.x) {
-                [self removeCardAtCurrentCell:mainCell];
+                return mainCell;
                 break;
             }
         }
         // The last one card remain
         else if ([visibleCellArray count] == 1)
         {
-            [self removeCardAtCurrentCell:mainCell];
+            return mainCell;
             break;
         }
         // The last two cards remain
         else if([people count] == 2)
         {
             if (self.peopleCollectionView.contentOffset.x >= mainCell.frame.size.width) {
-                [self removeCardAtCurrentCell:mainCell];
+                return mainCell;
                 break;
             }
         }
@@ -115,12 +211,14 @@
         else if ([visibleCellArray count] == 3)
         {
             if (mainCell.frame.origin.x > self.peopleCollectionView.contentOffset.x && mainCell.frame.origin.x < (self.peopleCollectionView.contentOffset.x   +mainCell.frame.size.width)) {
-                [self removeCardAtCurrentCell:mainCell];
+                return mainCell;
                 break;
             }
         }
     }
+    return nil;
 }
+ /*
 // remove the current cell on the screen
 - (void)removeCardAtCurrentCell:(NameTagCollectionViewCell *)ChosenCell
 {
@@ -129,10 +227,11 @@
     [self.removeCellAlertView show];
     self.removeChosenCell = ChosenCell;
 }
-
+*/
 
 #pragma mark Communication setup
 
+/*
 - (void)setupConnection
 {
     self.appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -159,7 +258,7 @@
 - (void)browserViewControllerWasCancelled:(MCBrowserViewController *)browserViewController {
     [self.appDelegate.CommunicationHandler.browser dismissViewControllerAnimated:YES completion:nil];
 }
-
+*/
 
 #pragma mark CollectionView setup
 
@@ -170,20 +269,35 @@
     [(EBCardCollectionViewLayout *) self.peopleCollectionView.collectionViewLayout setOffset:collectionViewOffset];
 }
 
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
     
-    return [self.peopleInformation count];
-
+    return [self.storyInformation count];
+    
 }
-
 
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
     NameTagCollectionViewCell  *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"peopleCollectionViewCell" forIndexPath:indexPath];
-    cell.peopleInfo = self.peopleInformation[indexPath.row];
+    cell.storyInfo = self.storyInformation[indexPath.row];
     return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
+{
+    NameTagCollectionViewCell *chosenCell = (NameTagCollectionViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    if (indexPath) {
+        [self.segueDestVC setLatitude:self.currentlocation.coordinate.latitude];
+        [self.segueDestVC setLongtitude:self.currentlocation.coordinate.longitude];
+        self.segueDestVC.storyImg = chosenCell.storyImageView.image;
+        self.segueDestVC.storyName = chosenCell.storyNameTextField.text;
+        self.segueDestVC.storyId = chosenCell.storyId;
+        self.segueDestVC.story = chosenCell.storyTextView.text;
+        self.segueDestVC.strViewImg = self.backgroundImgView.image;
+        NSLog(@"storyName:%@",self.segueDestVC.storyName);
+    }
 }
 
 - (BOOL)shouldAutorotate {
@@ -192,16 +306,9 @@
     return retVal;
 }
 
-- (IBAction)backButton:(UIButton *)sender
-{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    ViewController *backToMain = [storyboard instantiateViewControllerWithIdentifier:@"mainViewController"];
-    [backToMain setModalPresentationStyle:UIModalPresentationFullScreen];
-    [self presentViewController:backToMain animated:YES completion:NULL];
-}
-
 #pragma mark Pan gesture recognizer
 
+/*
 - (void)handlePan:(UIPanGestureRecognizer *)gestureRecognizer
 {
     //Create a image from the cell method:
@@ -245,14 +352,14 @@
         }
     }
 }
-
+*/
 
 
 #pragma mark Sending and receiving businesscard and response
 
 
 
-
+/*
 - (void)startSendingBusinesscard:(NameTagCollectionViewCell *)cardToSend
 {
     
@@ -320,6 +427,7 @@
 //  If the receiver touch Decline then he/she will drop the businesscard and reply 'declined' to the sender
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+    
     if (alertView == self.receiveDataAlertView){
         if (buttonIndex == 1) {
             NSDictionary *receiveDicReply = @{@"staus":@"received"};
@@ -351,8 +459,10 @@
     }
     
 }
+*/
 
 // When the user choose to accept the card, all the information on the card will be stored into local database
+/*
 - (void)savePeopleInfoToLocalDB
 {
     AppDelegate *app = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -367,7 +477,20 @@
     [app.managedObjectContext save:&error];
 
 }
-
+*/
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([[segue identifier] isEqualToString:@"commentSegue"]) {
+        commentPageViewController *cpc = [segue destinationViewController];
+        self.segueDestVC = cpc;
+    }
+    if ([[segue identifier] isEqualToString:@"addViewSegue"]) {
+        AddViewController *avc = [segue destinationViewController];
+        [avc setBackgroundImg:self.backgroundImgView.image];
+        [avc setCurrentlocation:self.currentlocation];
+        NSLog(@"currentPostalCode:::%@",self.currentPostalCode);
+    }
+}
 
 
 @end

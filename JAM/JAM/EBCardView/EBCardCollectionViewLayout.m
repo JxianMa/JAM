@@ -98,7 +98,7 @@ static NSString * const CellKind = @"CardCell";
             UICollectionViewLayoutAttributes *itemAttributes =
             [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
             itemAttributes.frame = [self frameForCardAtIndexPath:indexPath];
-            
+            itemAttributes.alpha = 1.0f;
             NSString *key = [self keyForIndexPath:indexPath];
             cellLayoutInfo[key] = itemAttributes;
         }
@@ -113,6 +113,7 @@ static NSString * const CellKind = @"CardCell";
     UICollectionViewLayoutAttributes *retVal = self.layoutInfo[@"CellKind"][key];
     return retVal;
 }
+
 
 - (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect{
     NSMutableArray *allAttributes = [NSMutableArray arrayWithCapacity:self.layoutInfo.count];
@@ -197,6 +198,8 @@ static NSString * const CellKind = @"CardCell";
         }
     }
 }
+
+
 
 - (void)dealloc {
     @try {

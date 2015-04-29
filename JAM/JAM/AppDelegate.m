@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 #import <AWSiOSSDKv2/AWSCore.h>
-
 @interface AppDelegate ()
 
 @end
@@ -18,6 +17,12 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.CommunicationHandler = [[CommunicationHandler alloc]init];
+    AWSCognitoCredentialsProvider *credentialsProvider = [AWSCognitoCredentialsProvider
+                                                          credentialsWithRegionType:AWSRegionUSEast1
+                                                          identityPoolId:@"us-east-1:f2cea054-b435-4dc6-82d4-ba352534a391"];
+    AWSServiceConfiguration *configuration = [AWSServiceConfiguration configurationWithRegion:AWSRegionUSEast1
+                                                                          credentialsProvider:credentialsProvider];
+    [AWSServiceManager defaultServiceManager].defaultServiceConfiguration = configuration;
    // Override point for customization after application launch.
     return YES;
 }

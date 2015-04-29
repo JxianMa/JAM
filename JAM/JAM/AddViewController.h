@@ -7,8 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
+
 
 @interface AddViewController : UIViewController<UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
-
+@property (nonatomic,strong)UIImage *backgroundImg;
+@property (nonatomic, strong) CLLocation *currentlocation;
 
 @end

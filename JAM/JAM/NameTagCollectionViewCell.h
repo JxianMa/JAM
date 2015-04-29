@@ -7,18 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PersonInfo.h"
-#import "People.h"
+#import "StoryModel.h"
 
 @interface NameTagCollectionViewCell : UICollectionViewCell<UITextFieldDelegate>
 
-@property (weak, nonatomic) IBOutlet UIImageView *personImageView;
-@property (weak, nonatomic) IBOutlet UITextField *personNameTextField;
-@property (weak, nonatomic) IBOutlet UITextField *personSelfDescTextField;
-@property (weak, nonatomic) IBOutlet UITextField *personPhoneNumTextField;
-@property (weak, nonatomic) IBOutlet UITextField *personEmailAddTextField;
+@property (weak, nonatomic) IBOutlet UIImageView *storyImageView;
+@property (weak, nonatomic) IBOutlet UITextField *storyNameTextField;
+@property (weak, nonatomic) IBOutlet UITextField *storyDescTextField;
+@property (weak, nonatomic) IBOutlet UITextView *storyTextView;
+@property (weak, nonatomic) IBOutlet UILabel *timeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *countingLabel;
+
 
 @property (strong, nonatomic) NSArray *textFieldsStatusArray;
-@property (strong, nonatomic) PersonInfo *personInfo;
-@property (strong, nonatomic) People *peopleInfo;
+@property (strong, nonatomic) StoryModel *storyInfo;
+@property (strong, nonatomic) NSNumber *storyId;
 @end
